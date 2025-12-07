@@ -1,16 +1,17 @@
 "use client"
 
-import {useEffect, useState} from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import {BankAccount, RegistrationType} from "@/lib/auth";
-import {WelcomeStep} from "@/components/registration/steps/welcome";
-import {AuthenticationStep} from "@/components/registration/steps/authentication";
-import {AccountsStep} from "@/components/registration/steps/accounts";
-import {CompletionStep} from "@/components/registration/steps/completion";
-import {ProgressIndicator} from "@/components/registration/progress";
-import {redirect} from "next/navigation";
+import { BankAccount, RegistrationType} from "@/lib/auth";
+import { WelcomeStep } from "@/components/registration/steps/welcome";
+import { AuthenticationStep } from "@/components/registration/steps/authentication";
+import { AccountsStep } from "@/components/registration/steps/accounts";
+import { CompletionStep } from "@/components/registration/steps/completion";
+import { ProgressIndicator } from "@/components/registration/progress";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
   const [registrationType, setRegistrationType] = useState<RegistrationType>(null)
   const [registeredAccounts, setRegisteredAccounts] = useState<BankAccount[]>([])
@@ -41,7 +42,7 @@ export default function Page() {
       .then(res => res.json())
       .then(user => {
         if (user.completedRegistration) {
-          redirect('/dashboard')
+          router.push('/dashboard')
         } else {
           setCurrentStep(2)
         }
