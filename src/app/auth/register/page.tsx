@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {BankAccount, RegistrationType} from "@/lib/auth";
 import {WelcomeStep} from "@/components/registration/steps/welcome";
@@ -8,11 +8,12 @@ import {AuthenticationStep} from "@/components/registration/steps/authentication
 import {AccountsStep} from "@/components/registration/steps/accounts";
 import {CompletionStep} from "@/components/registration/steps/completion";
 import {ProgressIndicator} from "@/components/registration/progress";
+import {redirect} from "next/navigation";
 
 export default function Page() {
   const [currentStep, setCurrentStep] = useState(0)
   const [registrationType, setRegistrationType] = useState<RegistrationType>(null)
-  const [accounts, setAccounts] = useState<BankAccount[]>([])
+  const [registeredAccounts, setRegisteredAccounts] = useState<BankAccount[]>([])
 
   const steps = [
     { id: "welcome", component: WelcomeStep },
@@ -35,6 +36,19 @@ export default function Page() {
     }
   }
 
+  useEffect(() => {
+    fetch('/api/user')
+      .then(res => res.json())
+      .then(user => {
+        if (user.completedRegistration) {
+          redirect('/dashboard')
+        } else {
+          setCurrentStep(2)
+        }
+      })
+      .catch(console.error)
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -53,8 +67,8 @@ export default function Page() {
               onBack={handleBack}
               registrationType={registrationType}
               setRegistrationType={setRegistrationType}
-              accounts={accounts}
-              setAccounts={setAccounts}
+              registeredAccounts={registeredAccounts}
+              setRegisteredAccounts={setRegisteredAccounts}
             />
           </motion.div>
         </AnimatePresence>

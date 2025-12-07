@@ -12,11 +12,18 @@ import {CurrencySelect, Currency} from "@/components/currencySelect";
 interface AccountsStepProps {
   onNext: () => void
   onBack: () => void
-  accounts: BankAccount[]
-  setAccounts: (accounts: BankAccount[]) => void
+  setRegisteredAccounts: (accounts: BankAccount[]) => void
 }
 
-export function AccountsStep({ onNext, onBack }: AccountsStepProps) {
+interface ServerBankAccount {
+  id: number
+  name: string
+  accountNumber: string
+  balance: number
+  currency: string
+}
+
+export function AccountsStep({ onNext, onBack, setRegisteredAccounts }: AccountsStepProps) {
   const [accounts, setAccounts] = useState<BankAccount[]>([])
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>()
   const [newAccount, setNewAccount] = useState({
@@ -26,7 +33,7 @@ export function AccountsStep({ onNext, onBack }: AccountsStepProps) {
   })
 
   const addAccount = async () => {
-    if (newAccount.name && newAccount.accountNumber && newAccount.balance && selectedCurrency) {
+    if (newAccount.name && newAccount.balance && selectedCurrency) {
       const tempId = `temp-${Math.random().toString(36).substr(2, 9)}`
       const optimisticAccount = {
         ...newAccount,
@@ -62,9 +69,8 @@ export function AccountsStep({ onNext, onBack }: AccountsStepProps) {
 
   const removeAccount = (id: string|number) => {
     setAccounts(accounts.filter((account) => account.id !== id))
-    console.log("removing account", id)
     if (typeof id === "number") {
-      fetch(`/api/auth/accounts/${id}`, {
+      fetch(`/api/bank-accounts/${id}`, {
         method: "DELETE",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -78,11 +84,14 @@ export function AccountsStep({ onNext, onBack }: AccountsStepProps) {
       credentials: "include",
     })
       .then(res => res.json())
-      .then(accounts => setAccounts(accounts))
+      .then(accounts => setAccounts(accounts
+        .map((a: ServerBankAccount) => ({ ...a, balance: a.balance.toString() }))))
       .catch(console.error)
   }, [])
 
-  console.log("accounts", accounts)
+  useEffect(() => {
+    setRegisteredAccounts(accounts)
+  }, [accounts, setRegisteredAccounts]);
 
   const formatCurrency = (value: string, currency: string) => {
     const number = Number.parseFloat(value.replace(/[^0-9.-]+/g, ""))
@@ -99,7 +108,7 @@ export function AccountsStep({ onNext, onBack }: AccountsStepProps) {
         <div>
           <h2 className="text-3xl font-bold tracking-tight mb-2">Add Your Bank Accounts</h2>
           <p className="text-muted-foreground text-pretty leading-relaxed">
-            {"Let's"} connect your existing accounts to get started
+            {"Let's"} add your existing accounts to get started
           </p>
         </div>
 
@@ -185,7 +194,7 @@ export function AccountsStep({ onNext, onBack }: AccountsStepProps) {
 
           <Button
             onClick={addAccount}
-            disabled={!newAccount.name || !newAccount.accountNumber || !newAccount.balance}
+            disabled={!newAccount.name || !newAccount.balance || !selectedCurrency}
             variant="outline"
             className="w-full bg-transparent"
           >

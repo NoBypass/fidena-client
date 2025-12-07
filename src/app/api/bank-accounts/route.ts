@@ -44,14 +44,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id")!;
-    console.log(userId)
 
     const accounts = await db.query.bankAccounts.findMany({
       where: eq(bankAccounts.userId, userId),
     })
 
     return NextResponse.json(accounts.map(a => ({
-      bankAccountId: a.id,
+      id: a.id,
       name: a.name,
       accountNumber: a.accountNumber,
       balance: a.initialBalance,

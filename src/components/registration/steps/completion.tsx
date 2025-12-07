@@ -3,24 +3,27 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { CheckCircle2, Sparkles } from "lucide-react"
-import {BankAccount, RegistrationType} from "@/lib/auth";
+import { BankAccount, RegistrationType } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 interface CompletionStepProps {
   registrationType: RegistrationType
-  accounts: BankAccount[]
+  registeredAccounts: BankAccount[]
 }
 
-export function CompletionStep({ registrationType, accounts }: CompletionStepProps) {
-  const totalBalance = accounts.reduce((sum, account) => {
-    const balance = Number.parseFloat(account.balance.replace(/[^0-9.-]+/g, ""))
-    return sum + (isNaN(balance) ? 0 : balance)
-  }, 0)
+export function CompletionStep({ registrationType, registeredAccounts }: CompletionStepProps) {
+  async function completeRegistration() {
+    try {
+      await fetch("/api/user/complete-registration", {
+        method: "POST",
+        credentials: "include",
+      })
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value)
+      redirect('/dashboard')
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
@@ -34,7 +37,7 @@ export function CompletionStep({ registrationType, accounts }: CompletionStepPro
         <div className="space-y-3">
           <h1 className="text-4xl font-bold tracking-tight text-balance">{"You're"} All Set!</h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto text-pretty leading-relaxed">
-            Your SecureBank account has been created successfully
+            Your Fidena account has been created successfully
           </p>
         </div>
 
@@ -52,32 +55,31 @@ export function CompletionStep({ registrationType, accounts }: CompletionStepPro
               </div>
 
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Connected Accounts</span>
-                <span className="font-medium">{accounts.length}</span>
-              </div>
-
-              <div className="flex justify-between pt-3 border-t">
-                <span className="text-muted-foreground">Total Balance</span>
-                <span className="font-bold text-lg text-accent">{formatCurrency(totalBalance)}</span>
+                <span className="text-muted-foreground">Added Accounts</span>
+                <span className="font-medium">{registeredAccounts.length}</span>
               </div>
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              <span className="font-semibold text-foreground">🔒 Your data is encrypted.</span> All account information
-              is protected with end-to-end encryption and stored securely.
-            </p>
-          </div>
+        {/*TODO handle if multiple currencies*/}
+        {/*  <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">*/}
+        {/*    <p className="text-sm text-muted-foreground leading-relaxed">*/}
+        {/*      <span className="font-semibold text-foreground">🔒 Your data is encrypted.</span> All account information*/}
+        {/*      is protected with end-to-end encryption and stored securely.*/}
+        {/*    </p>*/}
+        {/*  </div>*/}
         </div>
 
         <div className="pt-4 space-y-3">
           <Button
+            asChild
             size="lg"
             className="w-full md:w-auto px-8 bg-accent hover:bg-accent/90 text-accent-foreground"
-            onClick={() => window.location.reload()}
+            onClick={() => completeRegistration()}
           >
-            Go to Dashboard
+            <Link href="/dashboard" prefetch={false}>
+              Go to Dashboard
+            </Link>
           </Button>
           <p className="text-xs text-muted-foreground">{"You'll"} receive a confirmation email shortly</p>
         </div>
