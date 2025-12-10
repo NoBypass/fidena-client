@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { currency } from "./schema";
+import { currencies } from "./schema";
 
 const majorCurrencies = [
   { id: "USD", name: "US Dollar", symbol: "$" },
@@ -27,9 +27,9 @@ const majorCurrencies = [
 ];
 
 export async function ensureCurrencies() {
-  const count = await db.select().from(currency).limit(1);
+  const count = await db.select().from(currencies).limit(1);
   if (count.length === 0) {
-    await db.insert(currency).values(majorCurrencies).onConflictDoNothing();
+    await db.insert(currencies).values(majorCurrencies).onConflictDoNothing();
     console.log("Inserted major currencies into database.");
   }
 }

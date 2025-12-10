@@ -14,6 +14,7 @@ const simpleMatcher: Matcher[] = [
       new URLPattern({ pathname: '/api/bank-accounts/:path' }),
       new URLPattern({ pathname: '/api/user' }),
       new URLPattern({ pathname: '/api/user/complete-registration' }),
+      new URLPattern({ pathname: '/api/labels' }),
     ],
     handler: async (req: NextRequest) => {
       try {

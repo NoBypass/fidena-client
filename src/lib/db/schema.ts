@@ -1,8 +1,8 @@
-import {pgTable, text, timestamp, uuid, jsonb, serial, boolean, numeric} from "drizzle-orm/pg-core";
+import {pgTable, text, timestamp, uuid, jsonb, serial, boolean, numeric, integer} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  email: text("email").unique().notNull(),
+  email: text("email").unique(),
   passwordHash: text("password_hash"),
   registrationType: text("registration_type").notNull(), // 'webauthn' or 'password'
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -33,34 +33,41 @@ export const bankAccounts = pgTable("bank_accounts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   defaultCurrency: text("default_currency")
     .notNull()
-    .references(() => currency.id)
+    .references(() => currencies.id)
 })
 
-export const currency = pgTable("currency", {
+export const currencies = pgTable("currencies", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   symbol: text("symbol").notNull(),
 })
 
-export const userMerchant = pgTable("user_merchant", {
+export const merchants = pgTable("merchants", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  pfpLocation: text("pfp_location"),
+  color: text("color"),
+  // TODO default labels
+})
+
+export const userMerchants = pgTable("user_merchants", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  merchantId: uuid("merchant_id")
+  merchantId: integer("merchant_id")
     .notNull()
-    .references(() => merchant.id, { onDelete: "cascade" }),
+    .references(() => merchants.id, { onDelete: "cascade" }),
   name: text("name"),
   pfpLocation: text("pfp_location"),
   color: text("color"),
 })
 
-export const merchant = pgTable("merchant", {
+export const labels = pgTable("labels", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id")
+    .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  pfpLocation: text("pfp_location"),
-  color: text("color"),
-  // TODO default labels
+  color: text("color").notNull(),
 })
