@@ -2,7 +2,7 @@ import { pgTable, text, timestamp, uuid, jsonb, serial, integer, boolean } from 
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  email: text("email").unique(),
+  email: text("email").unique().notNull(),
   passwordHash: text("password_hash"),
   registrationType: text("registration_type").notNull(), // 'webauthn' or 'password'
   createdAt: timestamp("created_at").defaultNow().notNull(),
