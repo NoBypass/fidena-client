@@ -41,6 +41,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export type BankAccountDTO = {
+  id: number
+  name: string
+  accountNumber: string | null
+  balance: number
+  currency: string
+}
+
 export async function GET(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id")!;

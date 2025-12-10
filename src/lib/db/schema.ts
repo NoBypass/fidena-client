@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, jsonb, serial, integer, boolean } from "drizzle-orm/pg-core";
+import {pgTable, text, timestamp, uuid, jsonb, serial, integer, boolean, decimal, numeric} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -28,7 +28,7 @@ export const bankAccounts = pgTable("bank_accounts", {
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   accountNumber: text("account_number"),
-  initialBalance: integer("initial_balance").notNull(),
+  initialBalance: numeric("initial_balance", { precision: 19, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   defaultCurrency: text("default_currency")
     .notNull()

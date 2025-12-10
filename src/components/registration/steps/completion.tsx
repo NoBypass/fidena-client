@@ -77,7 +77,7 @@ export function CompletionStep({ registrationType, registeredAccounts }: Complet
             className="w-full md:w-auto px-8 bg-accent hover:bg-accent/90 text-accent-foreground"
             onClick={() => completeRegistration()}
           >
-            <Link href="/dashboard" prefetch={false}>
+            <Link href="/home/dashboard" prefetch={false}>
               Go to Dashboard
             </Link>
           </Button>

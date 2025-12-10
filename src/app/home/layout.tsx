@@ -14,9 +14,11 @@ export default function Layout({
 
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-card">
       <Sidebar />
-      <main>{children}</main>
+      <main className="p-6">
+        {children}
+      </main>
     </div>
   )
 }

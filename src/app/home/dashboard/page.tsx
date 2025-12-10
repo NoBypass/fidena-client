@@ -1,5 +1,5 @@
 export default function DashboardPage() {
   return (
-    <p>Dashboard</p>
+    <h1 className="font-bold text-xl">Dashboard</h1>
   )
 }

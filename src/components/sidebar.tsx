@@ -7,31 +7,32 @@ import {
   Tag,
   Store,
   Settings,
-  CreditCard,
-  ChevronRight,
   ChevronsUpDown,
   LogOut, MessagesSquare, ShieldPlus, Sparkles, ArrowRightLeft
 } from "lucide-react"
-import {BankAccount} from "@/lib/auth";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {useEffect, useState} from "react";
 import {users} from "@/lib/db/schema";
 import {Separator} from "@/components/ui/separator";
+import {Button} from "@/components/ui/button";
+import Link from "next/link";
+import {usePathname} from "next/navigation";
 
 export function Sidebar() {
   const [user, setUser] = useState<typeof users.$inferSelect>()
+  const pathname = usePathname()
 
   const navigation = [
     [
-      { name: "Dashboard", icon: LayoutDashboard, id: "dashboard", active: true },
-      { name: "Accounts", icon: Building2, id: "accounts", active: false },
-      { name: "Merchants", icon: Store, id: "merchants", active: false },
-      { name: "Labels", icon: Tag, id: "labels", active: false },
-      { name: "Transactions", icon: ArrowRightLeft, id: "transactions", active: false },
+      { name: "Dashboard", icon: LayoutDashboard, id: "dashboard" },
+      { name: "Accounts", icon: Building2, id: "accounts" },
+      { name: "Merchants", icon: Store, id: "merchants" },
+      { name: "Labels", icon: Tag, id: "labels" },
+      { name: "Transactions", icon: ArrowRightLeft, id: "transactions" },
     ],
     [
-      { name: "Updates", icon: Sparkles, id: "updates", active: false },
+      { name: "Updates", icon: Sparkles, id: "updates" },
     ]
   ]
 
@@ -73,19 +74,23 @@ export function Sidebar() {
         <nav className={`flex-1 p-2 space-y-1 w-full ${index !== 0 ? "place-self-end justify-self-start" : ""}`} key={index}>
           {section.map((item) => {
             const Icon = item.icon
+            const path = `/home/${item.id}`
             return (
-              <button
+              <Button
+                asChild
                 key={item.id}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
-                  item.active
-                    ? "bg-muted text-primary"
+                  "bg-transparent w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                  path === pathname
+                    ? "bg-muted text-primary hover:bg-muted"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
-                <span className="flex-1 text-left">{item.name}</span>
-              </button>
+                <Link href={path} passHref>
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="flex-1 text-left">{item.name}</span>
+                </Link>
+              </Button>
             )
           })}
         </nav>

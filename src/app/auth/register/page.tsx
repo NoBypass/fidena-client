@@ -41,6 +41,7 @@ export default function Page() {
     fetch('/api/user')
       .then(res => res.json())
       .then(user => {
+        if (user.error) throw user.error
         if (user.completedRegistration) {
           router.push('/dashboard')
         } else {
