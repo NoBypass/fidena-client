@@ -17,7 +17,7 @@ import {users} from "@/lib/db/schema";
 import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
+import {redirect, usePathname} from "next/navigation";
 
 export function Sidebar() {
   const [user, setUser] = useState<typeof users.$inferSelect>()
@@ -46,12 +46,12 @@ export function Sidebar() {
       .catch(console.error)
   }, [])
 
-  function emailToName(email: string|undefined) {
+  function emailToName(email: string|undefined|null) {
     if (!email) return ""
     return email.split("@")[0].replace(".", " ")
   }
 
-  function emailToInitials(email: string|undefined) {
+  function emailToInitials(email: string|undefined|null) {
     if (!email) return ""
     return email.split("@")[0].split(".").map(s => s[0]).join("")
   }
@@ -116,7 +116,13 @@ export function Sidebar() {
             <button className="flex items-center gap-2 hover:bg-muted/50 w-full p-2 rounded-lg"><MessagesSquare className="size-4" /> Help & Support</button>
             <button className="flex items-center gap-2 hover:bg-muted/50 w-full p-2 rounded-lg"><Settings className="size-4" /> Settings</button>
             <Separator className="my-2" />
-            <button className="text-destructive flex items-center gap-2 hover:bg-muted/50 w-full p-2 rounded-lg"><LogOut className="size-4" /> Log Out</button>
+            <button className="text-destructive flex items-center gap-2 hover:bg-muted/50 w-full p-2 rounded-lg"
+                    onClick={() => {
+                      fetch("/api/auth/logout", { method: "GET", credentials: "include" })
+                      redirect("/auth/register")
+                    }}>
+              <LogOut className="size-4" /> Log Out
+            </button>
           </PopoverContent>
         </Popover>
       </div>
