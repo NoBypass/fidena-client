@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils"
 type InputProps = React.ComponentProps<"input"> & {
   startContent?: React.ReactNode
   endContent?: React.ReactNode
+  inputClassName?: string
 }
 
-function Input({ className, type, startContent, endContent, ...props }: InputProps) {
+function Input({ className, type, startContent, endContent, inputClassName, ...props }: InputProps) {
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const containerRef = React.useRef<HTMLDivElement | null>(null)
 
@@ -57,7 +58,7 @@ function Input({ className, type, startContent, endContent, ...props }: InputPro
           "h-9 flex-1 w-full min-w-0 bg-transparent px-3 py-1 text-base outline-none border-0 placeholder:text-muted-foreground",
           "file:text-foreground selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
           "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          ""
+          inputClassName
         )}
       />
 

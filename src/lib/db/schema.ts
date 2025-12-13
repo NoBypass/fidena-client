@@ -51,33 +51,7 @@ export const merchants = pgTable("merchants", {
 })
 
 export const merchantRelations = relations(merchants, ({ many }) => ({
-  defaultLabels: many(merchantDefaultLabels),
   userMerchants: many(userMerchants),
-}));
-
-export const merchantDefaultLabels = pgTable("merchant_default_labels", {
-  merchantId: integer("merchant_id")
-    .notNull()
-    .references(() => merchants.id, {onDelete: "cascade"}),
-  labelId: integer("label_id")
-    .notNull()
-    .references(() => labels.id, {onDelete: "cascade"}),
-} , (table) => ({
-  pk: {
-    name: "merchant_default_labels_pkey",
-    columns: [table.merchantId, table.labelId],
-  },
-}))
-
-export const merchantDefaultLabelsRelations = relations(merchantDefaultLabels, ({ one }) => ({
-  merchant: one(merchants, {
-    fields: [merchantDefaultLabels.merchantId],
-    references: [merchants.id],
-  }),
-  label: one(labels, {
-    fields: [merchantDefaultLabels.labelId],
-    references: [labels.id],
-  }),
 }));
 
 export const userMerchants = pgTable("user_merchants", {
@@ -86,7 +60,6 @@ export const userMerchants = pgTable("user_merchants", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   merchantId: integer("merchant_id")
-    .notNull()
     .references(() => merchants.id, { onDelete: "cascade" }),
   name: text("name"),
   pfpLocation: text("pfp_location"),

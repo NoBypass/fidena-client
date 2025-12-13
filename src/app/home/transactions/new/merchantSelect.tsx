@@ -12,33 +12,44 @@ import {MerchantDTO} from "@/app/api/merchants/route";
 type Props = {
   merchant: MerchantDTO | undefined;
   setMerchant: React.Dispatch<React.SetStateAction<MerchantDTO | undefined>>
-  setMerchantDefaultLabels: React.Dispatch<React.SetStateAction<LabelDTO[]>>
+  setMerchantDefaultLabels?: React.Dispatch<React.SetStateAction<LabelDTO[]>>
+  allowCreate?: boolean
+  label?: string
+  presetOnly?: boolean
 };
 
 // TODO make it so option to create new label doesnt only show when no other label can be matched for
 export default function MerchantSelect({
                                          merchant: selectedMerchant,
                                          setMerchant: setSelectedMerchant,
-                                         setMerchantDefaultLabels
+                                         setMerchantDefaultLabels,
+                                         allowCreate = true,
+                                         label = "Merchant",
+                                         presetOnly = false,
                                        }: Props) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [serverMerchants, setServerMerchants] = useState<MerchantDTO[]>([])
 
   useEffect(() => {
-    fetch("/api/merchants", {
+    fetch(`/api/merchants${presetOnly ? "/presets" : ""}`, {
       method: "GET",
       credentials: "include",
     }).then((res) => res.json())
       .then((data: MerchantDTO[]|APIError) => {
         if ("error" in data) throw Error(data.error)
-        else setServerMerchants(data)
+        // else setServerMerchants(data)
+        else setServerMerchants([{
+          id: -1,
+          name: "Test Merchant",
+        }])
       })
       .catch(console.error) // TODO handle this better (toast)
   }, []);
 
   function handleMerchantSelect(merchant: MerchantDTO) {
-    setMerchantDefaultLabels(merchant.defaultLabels || [])
+    if (setMerchantDefaultLabels)
+      setMerchantDefaultLabels(merchant.defaultLabels || [])
     setSelectedMerchant(merchant)
     setOpen(false)
   }
@@ -58,7 +69,7 @@ export default function MerchantSelect({
   return (
     <div className="space-y-1.5">
       <Label className="text-sm">
-        Merchant <span className="text-destructive">*</span>
+        {label} <span className="text-destructive">*</span>
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -75,7 +86,7 @@ export default function MerchantSelect({
                 <span>{selectedMerchant.name}</span>
               </div>
             ) : (
-              <span className="text-muted-foreground">Select or create merchant...</span>
+              <span className="text-muted-foreground">Select {allowCreate && "or create"} merchant...</span>
             )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -91,10 +102,11 @@ export default function MerchantSelect({
               <CommandEmpty>
                 <div className="py-4 text-center">
                   <p className="text-sm text-muted-foreground mb-2">No merchant found.</p>
-                  <Button size="sm" onClick={handleCreateMerchant} className="gap-1.5">
+                  {allowCreate && <Button size="sm" onClick={handleCreateMerchant} className="gap-1.5">
                     <Plus className="h-3.5 w-3.5" />
                     Create &#34;{search}&#34;
-                  </Button>
+                  </Button>}
+                {/*  TODO connect up  */}
                 </div>
               </CommandEmpty>
               <CommandGroup>

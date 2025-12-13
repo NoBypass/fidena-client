@@ -25,14 +25,16 @@ const labelColors = [
 type Props = {
   labels: LabelDTO[]
   setLabels: React.Dispatch<React.SetStateAction<LabelDTO[]>>
-  merchantDefaultLabels: LabelDTO[]
-  setMerchantDefaultLabels: React.Dispatch<React.SetStateAction<LabelDTO[]>>
+  merchantDefaultLabels?: LabelDTO[]
+  setMerchantDefaultLabels?: React.Dispatch<React.SetStateAction<LabelDTO[]>>
+  formLabel?: string
 };
 
 // TODO make it so option to create new label doesnt only show when no other label can be matched for
 export default function LabelsSelect({
   labels, setLabels,
   merchantDefaultLabels, setMerchantDefaultLabels,
+  formLabel = "Labels",
 }: Props) {
   const [open, setOpen] = useState(false)
   const [selectedColor, setSelectedColor] = useState(labelColors[0])
@@ -52,6 +54,8 @@ export default function LabelsSelect({
   }, []);
 
   useEffect(() => {
+    if (!merchantDefaultLabels || !setMerchantDefaultLabels) return
+
     const merchantDefaultLabelsWithoutExisting = merchantDefaultLabels
       .filter((dLabel) => !labels.some((l) => l.name === dLabel.name))
 
@@ -81,12 +85,13 @@ export default function LabelsSelect({
 
   const handleRemove = (labelName: string) => {
     setLabels(labels.filter((label) => label.name !== labelName))
-    setMerchantDefaultLabels(merchantDefaultLabels.filter((l) => l.name !== labelName))
+    if (merchantDefaultLabels && setMerchantDefaultLabels)
+      setMerchantDefaultLabels(merchantDefaultLabels.filter((l) => l.name !== labelName))
   }
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-sm">Labels</Label>
+      <Label className="text-sm">{formLabel}</Label>
       <div className="border rounded-lg p-3 space-y-2">
         {labels.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
