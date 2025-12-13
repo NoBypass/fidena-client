@@ -2,7 +2,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Button} from "@/components/ui/button";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 import {CheckIcon, ChevronsUpDownIcon} from "lucide-react";
-import {cn} from "@/lib/utils";
+import {APIError, cn} from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export type Currency = {
@@ -12,45 +12,37 @@ export type Currency = {
 };
 
 type CurrencySelectProps = {
-  selectedCurrency: Currency | undefined;
+  selectedCurrencyStr: string | undefined;
   setSelectedCurrency: (currency: Currency | undefined) => void;
   className?: string;
 };
 
-export function CurrencySelect({selectedCurrency, setSelectedCurrency, className}: CurrencySelectProps) {
+export function CurrencySelect({selectedCurrencyStr, setSelectedCurrency, className}: CurrencySelectProps) {
   const [open, setOpen] = useState(false)
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const ac = new AbortController();
+    fetch("/api/currencies", {
+      method: "GET",
+      credentials: "include",
+    }).then((res) => res.json() as Promise<Currency[]|APIError>)
+      .then((data) => {
+        if ("error" in data) throw Error(data.error)
 
-    async function loadCurrencies() {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch("/api/currencies", {
-          method: "GET",
-          credentials: "include",
-          signal: ac.signal,
-        });
-        if (!res.ok) throw new Error(`Failed to fetch currencies: ${res.status}`);
-        const data: Currency[] = await res.json();
-        setCurrencies(data || []);
-      } catch (err: any) {
+        setCurrencies(data);
+      })
+      .catch((err) => {
         if (err.name !== "AbortError") {
           console.error(err);
           setError(err.message ?? "Failed to fetch currencies");
         }
-      } finally {
-        setLoading(false);
-      }
-    }
+      })
+      .finally(() => setLoading(false));
+    }, []);
 
-    loadCurrencies();
-    return () => ac.abort();
-  }, []);
+  const selectedCurrency = currencies?.find((c) => c.id === selectedCurrencyStr)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -80,7 +72,10 @@ export function CurrencySelect({selectedCurrency, setSelectedCurrency, className
                   keywords={[currency.id, currency.name, currency.symbol]}
                   key={currency.id}
                   value={currency.id}
-                  onSelect={() => setSelectedCurrency(currency)}
+                  onSelect={() => {
+                    setOpen(false)
+                    setSelectedCurrency(currency)
+                  }}
                 >
                   <CheckIcon
                     className={cn(

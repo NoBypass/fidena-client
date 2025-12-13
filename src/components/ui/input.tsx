@@ -62,7 +62,7 @@ function Input({ className, type, startContent, endContent, ...props }: InputPro
       />
 
       {endContent ? (
-        <div className="mr-2 ml-1 flex items-center pointer-events-auto" data-slot="end">
+        <div className="mr-2 flex items-center pointer-events-auto" data-slot="end">
           {endContent}
         </div>
       ) : null}

@@ -7,7 +7,7 @@ import CreateLabelForm from "@/app/home/labels/createForm";
 import {LabelDTO} from "@/app/api/labels/route";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {Color, possibleStyles} from "@/lib/utils";
-import {Badge, TrendingDown, TrendingUp} from "lucide-react";
+import {TrendingDown, TrendingUp} from "lucide-react";
 
 export default function LabelsPage() {
   const [labels, setLabels] = useState<LabelDTO[]>([])

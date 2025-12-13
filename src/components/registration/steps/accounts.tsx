@@ -173,6 +173,7 @@ export function AccountsStep({ onNext, onBack, setRegisteredAccounts }: Accounts
           </div>
 
           <div className="space-y-2">
+            {/*TODO replace with MoneyField component*/}
             <Label htmlFor="balance">Current Balance</Label>
             <Input
               id="balance"

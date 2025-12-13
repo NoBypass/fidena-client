@@ -30,3 +30,7 @@ export const possibleStyles = {
 export type Color = keyof typeof possibleStyles
 
 export const styleKeys = Object.keys(possibleStyles) as Array<Color>
+
+export type APIError = {
+  error: string
+}
